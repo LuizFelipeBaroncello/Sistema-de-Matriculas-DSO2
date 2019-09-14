@@ -49,6 +49,33 @@ function buscaDisciplinas() {
             .find({})
 }
 
+function insereAlunoNoBanco(nome, matricula) {
+    client
+        .db(dbName)
+        .collection("aluno")
+        .insertOne({nome: nome, matriculaAluno: matricula});
+}
+
+function atualizaAlunoNoBanco(nome, matricula) {
+    client
+    .db(dbName)
+    .collection("aluno")
+    .updateOne(
+        {
+            matriculaAluno: matricula
+        },
+        {
+            $set: {nome: nome}
+        },
+        function (err, result) {
+            if (err) {
+                console.log(err  + "errror banco");
+                throw err;
+            }
+            return;
+        });
+}
+
 app.get("/registerAluno", function(req, res) {
     res.render("registerAluno", {
         title: "Novo aluno",
@@ -78,13 +105,6 @@ function validateAluno(nome, matricula, res) {
     return true;
 }
 
-function insereAlunoNoBanco(nome, matricula) {
-    client
-        .db(dbName)
-        .collection("aluno")
-        .insertOne({nome: nome, matriculaAluno: matricula});
-}
-
 function renderizaTelaBadRequest(res) {
     res.render("badRequest", {title: "Requisição inválida"});
 }
@@ -105,49 +125,32 @@ function cadastraNovoAluno(req, res) {
                     res.redirect("/");
                 } else {
                     renderizaTelaBadRequest(res);
-                    return;
                 }
             }
-        }
-);
+        });
+}
 
+function atualizaAluno(req, res) {
+    const nome = req.body.nome.trim();
+    const matricula = req.params.matricula;
+
+    const isAlunoValido = validateAluno(nome, matricula); 
+
+    if (!isAlunoValido) {
+        renderizaTelaBadRequest(res);
+    } else {
+        atualizaAlunoNoBanco(nome, matricula);
+        res.redirect("/");
+    }
 }
 
 app.post("/registerAluno/:matricula?", function(req, res) {
     if (!req.params.matricula) {
         cadastraNovoAluno(req, res);
     } else {
-        var nome = req.body.nome.trim();
-        var matricula = req.params.matricula;
-        if (!nome) {
-            res.render("badRequest", {title: "Requisição inválida"});
-            console.log("Nome não informado...")
-            return;
-        }
-
-        //Realiza o UPDATE no banco.
-        console.log("update...")
-            client
-            .db(dbName)
-            .collection("aluno")
-            .updateOne(
-                {
-                    matriculaAluno: matricula
-                },
-                {
-                    $set: {nome: nome}
-                },
-                function (err, result) {
-                    if (err) {
-                        console.log(err);
-                        throw err;
-                    }
-                    res.redirect("/");
-                    return;
-                });
+        atualizaAluno(req, res);
     }
 }); 
-
 
 /////////////////////////////////////////////
 //DISCIPLINA
