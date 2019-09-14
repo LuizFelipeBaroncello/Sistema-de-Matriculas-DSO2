@@ -148,7 +148,6 @@ function validateAluno(nome, matricula, res) {
 
 function validateDisciplina(nome, codigo, qtdHorariosSelecionados, res) {
     if (!nome || !codigo || (qtdHorariosSelecionados < 1 || qtdHorariosSelecionados > 4)) {
-        renderizaTelaBadRequest(res);
         return false;
     }
 
@@ -288,7 +287,6 @@ function atualizaDisciplina(req, res) {
     } else {
         atualizaDisciplinaNoBanco(codigo, nome, res);
     }
-
 }
 
 app.post("/registerDisciplina/:codigoDisciplina?", function(req, res) {
