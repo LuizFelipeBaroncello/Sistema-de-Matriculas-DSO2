@@ -1,0 +1,189 @@
+<%- contentFor('body') %>
+<h1 class="text-center">Disciplina</h1>
+
+<form method="post" action="/registerDisciplina/<%=(disciplina.codigoDisciplina ? disciplina.codigoDisciplina : '')%>">
+    <div class="form-group">
+      <div class="col-md-12">
+            <% if (disciplina.codigoDisciplina) { %>
+                <label for="campo-disciplina">Código Disciplina</label>
+                <input type="text" disabled="true" class="form-control" value="<%=disciplina.codigoDisciplina%>" id="campo-disciplina" >
+            <% } else { %>
+                <label for="campo-registro-disciplina"> Código Disciplina</label>
+                <input type="text" name="codigoDisciplina" class="form-control" id="campo-registro-disciplina" placeholder="Código da disciplina">
+            <% } %>  
+            <br/>
+            <label for="campo-nome-disciplina">Nome Disciplina</label>
+            <input type="text" class="form-control" id="campo-nome-disciplina" name="nome" value="<%=disciplina.nome%>" placeholder="Nome disciplina">
+            <br/>
+
+            <!-- Cadastrar horários aqui -->
+            <!-- FALTA SALVAR OS HORÁRIOS EM VARIÁVEIS E TRATAR NO SERVIÇO-->
+            <h2>Cadastrar horários Disciplina</h2>
+            <div class="text-left">
+                OBS: Escolha no mínimo um horário, e no máximo 4.
+            </div>
+            <br>
+            <div class="table-responsive text-center">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th class="text-center">Segunda</th>
+                            <th class="text-center">Terça</th>
+                            <th class="text-center">Quarta</th>
+                            <th class="text-center">Quinta</th>
+                            <th class="text-center">Sexta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="text-center">6:30</th>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox" name="seg1">
+                                    <span class="checkmark"></span>
+                                </label>                                          
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox" name="ter1">
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox" name="quat1">
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <input type="checkbox" name="quint1">
+                                    <span class="checkmark"></span>
+                                </label>                     
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <input type="checkbox" name="sex1">
+                                    <span class="checkmark"></span>
+                                </label>                                                     
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-center">7:20</th>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox" name="seg2">
+                                    <span class="checkmark"></span>
+                                </label>                                          
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox" name="ter2">
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox" name="quat2">
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <input type="checkbox" name="quint2">
+                                    <span class="checkmark"></span>
+                                </label>                     
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <input type="checkbox" name="sex2">
+                                    <span class="checkmark"></span>
+                                </label>                                                     
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-center">8:20</th>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox"  name="seg3">
+                                    <span class="checkmark"></span>
+                                </label>                                          
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox" name="ter3">
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox" name="quat3">
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <input type="checkbox" name="quint3">
+                                    <span class="checkmark"></span>
+                                </label>                     
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <input type="checkbox" name="sex3">
+                                    <span class="checkmark"></span>
+                                </label>                                                     
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-center">9:10</th>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox" name="seg4">
+                                    <span class="checkmark"></span>
+                                </label>                                          
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox" name="ter4">
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <input type="checkbox" name="quat4">
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <input type="checkbox" name="quint4">
+                                    <span class="checkmark"></span>
+                                </label>                     
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <input type="checkbox" name="sex4">
+                                    <span class="checkmark"></span>
+                                </label>                                                     
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-md-1">
+            <a href="/">
+                <button type="button" class="btn btn-danger">
+                Cancelar   
+                </button>
+            </a>
+        </div>
+        <div class="col-md-10"></div>
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-success">
+                Enviar   
+            </button>
+        </div>
+    </div>
+</form>

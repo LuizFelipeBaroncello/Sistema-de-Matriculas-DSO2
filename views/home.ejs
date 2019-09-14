@@ -1,0 +1,22 @@
+<%- contentFor('body') %>
+<h1 class="text-center">SYSMATRI</h1>
+<div class="container">
+    <div class="col-md-12 jumbotron">
+        <div class="col-md-6">
+            <h2>Alunos</h2>
+            <ul>
+                <% listaAlunos.forEach(function(aluno) { %>
+                    <li><%= aluno.nome %> (<a href="/registerAluno/<%=aluno.matriculaAluno%>"><%= aluno.matriculaAluno %></a>)</li>
+                <% }); %>
+            <ul>
+        </div>
+        <div class="col-md-6">
+            <h2>Disciplinas</h2>
+            <ul>
+                <% listaDisciplinas.forEach(function(disciplina) { %>
+                    <li><%= disciplina.nome %> (<a href="/registerDisciplina/<%=disciplina.codigoDisciplina%>"><%= disciplina.codigoDisciplina %></a>)</li>
+                <% }); %>
+            <ul>
+        </div>
+    </div>
+</div>
