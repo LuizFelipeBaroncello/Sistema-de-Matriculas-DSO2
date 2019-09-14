@@ -72,25 +72,25 @@ function atualizaAlunoNoBanco(nome, matricula) {
         });
 }
 
-function atualizaDisciplinaNoBanco(codigo, nome, res) {
+function atualizaDisciplinaNoBanco(codigo, nome, horariosDiciplinas, res) {
     client
-    .db(dbName)
-    .collection("disciplina")
-    .updateOne(
-        {
-            codigoDisciplina: codigo
-        },
-        {
-            $set: {nome: nome}
-        },
-        function (err, result) {
-            if (err) {
-                console.log(err);
-                throw err;
-            }
-            res.redirect("/");
-            return;
-        });
+        .db(dbName)
+        .collection("disciplina")
+        .updateOne(
+            {
+                codigoDisciplina: codigo
+            },
+            {
+                $set: {nome: nome, horarios: horariosDiciplinas}
+            },
+            function (err, result) {
+                if (err) {
+                    console.log(err);
+                    throw err;
+                }
+                res.redirect("/");
+                return;
+            });
 }
 
 function buscaDisciplinaPorCodigo(codigo) {
@@ -222,13 +222,37 @@ app.get("/registerDisciplina/:codigoDisciplina", function(req, res) {
             if (!disciplina){
                 renderizaTelaNotFound(res);
             } else {
+                const disciplinaTela = {...disciplina, horarios: criaMatrizHorariosSelecionadosFromBanco(disciplina.horarios)};
+
                 res.render("registerDisciplina", {
                     title: "Alterar disciplina", 
-                    disciplina: disciplina
+                    disciplina: disciplinaTela
                 });
             }
         });
 });
+
+function criaMatrizHorariosSelecionadosFromBanco(horarios) {
+    let matrizCriada = [];
+    
+    for (diaSemana = 0; diaSemana < 5; diaSemana++) {
+        matrizCriada.push([]);
+        for (horarioAula = 0; horarioAula < 4; horarioAula++) {
+            let horarioSetado = false;
+            horarios.forEach(horario => {
+                if (horario.diaSemana == diaSemana && horario.horario == horarioAula) {
+                    matrizCriada[diaSemana].push("checked")
+                    horarioSetado = true;
+                }
+            });
+            if(!horarioSetado) {
+                matrizCriada[diaSemana].push(null);
+            }
+        }
+    }
+
+    return matrizCriada;
+}
 
 function criaMatrizHorariosSelecionados(req) {
     const horariosSegunda = [req.body.seg1, req.body.seg2, req.body.seg3, req.body.seg4];
@@ -281,11 +305,25 @@ function atualizaDisciplina(req, res) {
     const nome = req.body.nome.trim();
     const codigo = req.params.codigoDisciplina;
 
-    if (!nome) {
+    const horarios = criaMatrizHorariosSelecionados(req);
+    let qtdHorariosSelecionados = 0;
+    let horariosDiciplinas = [];
+
+    for (diaSemana = 0; diaSemana < horarios.length; diaSemana++) {
+        for (horarioAula = 0; horarioAula < horarios[diaSemana].length; horarioAula++) {
+            if(horarios[diaSemana][horarioAula]){
+                qtdHorariosSelecionados++;
+                horariosDiciplinas.push({diaSemana: diaSemana, horario: horarioAula});
+            }
+        }
+    }
+
+    const isDisciplinaValida = validateDisciplina(nome, codigo, qtdHorariosSelecionados, res);
+
+    if (!isDisciplinaValida) {
         renderizaTelaBadRequest(res)
-        return;
     } else {
-        atualizaDisciplinaNoBanco(codigo, nome, res);
+        atualizaDisciplinaNoBanco(codigo, nome, horariosDiciplinas, res);
     }
 }
 
