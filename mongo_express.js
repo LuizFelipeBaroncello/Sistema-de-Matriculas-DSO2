@@ -15,20 +15,39 @@ const dbName = "matriculas";
 app.use(express.static(__dirname + '/public'));
 
 app.get("/", function(req, res) {
-    client
-        .db(dbName)
-        .collection("aluno")
-        .find({})
+    renderizaPaginaInicial(res);
+});
+
+function renderizaPaginaInicial(res) {
+    buscaAlunos()
         .toArray(function (err, alunos) {
-            client
+            buscaDisciplinas()
+                .toArray(function (err, disciplinas) {
+                    res.render("home", {title: "Inicio", listaAlunos: alunos, listaDisciplinas: disciplinas});
+                });
+        });
+}
+
+function buscaAlunos() {
+    return client
+            .db(dbName)
+            .collection("aluno")
+            .find({});
+}
+
+function buscaAlunoPorMatricula(matricula){
+    return client
+                .db(dbName)
+                .collection("aluno")
+                .findOne({matriculaAluno: matricula})                    
+}
+
+function buscaDisciplinas() {
+    return client
             .db(dbName)
             .collection("disciplina")
             .find({})
-            .toArray(function (err, disciplinas) {
-                res.render("home", {title: "Inicio", listaAlunos: alunos, listaDisciplinas: disciplinas});
-            });
-        });
-});
+}
 
 app.get("/registerAluno", function(req, res) {
     res.render("registerAluno", {
@@ -38,54 +57,66 @@ app.get("/registerAluno", function(req, res) {
 });
 
 app.get("/registerAluno/:matriculaAluno", function(req, res) {
-    client
-        .db(dbName)
-        .collection("aluno")
-        .findOne({matriculaAluno: req.params.matriculaAluno})
+    buscaAlunoPorMatricula(req.params.matriculaAluno)
         .then(function (aluno) {
-            if (!aluno)
+            if (!aluno){
                 res.render("naoEncontrado", {title: "Não Encontrado"});
-            else
+            } else {
                 res.render("registerAluno", {
                     title: "Alterar aluno", 
                     aluno: aluno
                 });
+            }
         });
 });
 
-app.post("/registerAluno/:matricula?", function(req, res) {
+function validateAluno(nome, matricula, res) {
+    if (!nome || !matricula) {
+        return false;
+    }
 
-    if (!req.params.matricula) {
-        var matricula = req.body.matriculaAluno.trim();
-        
-        client
+    return true;
+}
+
+function insereAlunoNoBanco(nome, matricula) {
+    client
         .db(dbName)
         .collection("aluno")
-        .findOne({matriculaAluno:matricula})
-        .then(function(aluno){
+        .insertOne({nome: nome, matriculaAluno: matricula});
+}
 
+function renderizaTelaBadRequest(res) {
+    res.render("badRequest", {title: "Requisição inválida"});
+}
+
+function cadastraNovoAluno(req, res) {
+    let matricula = req.body.matriculaAluno.trim();
+   
+    buscaAlunoPorMatricula(matricula)
+       .then(function(aluno) {
             if(aluno) {
                 res.render("dadoJaCadastrado", {codigo: matricula, title: "Dado já cadastrado"});
-            } else{
-                var nome = req.body.nome.trim();
+            } else {
+                let nome = req.body.nome.trim();
+                let isAlunoValido = validateAluno(nome, matricula, res);
 
-                if (!nome || !matricula) {
-                    res.render("badRequest", {title: "Requisição inválida"});
+                if (isAlunoValido) {
+                    insereAlunoNoBanco(nome, matricula);
+                    res.redirect("/");
+                } else {
+                    renderizaTelaBadRequest(res);
                     return;
                 }
-        
-                client
-                    .db(dbName)
-                    .collection("aluno")
-                    .insertOne({nome: nome, matriculaAluno: matricula});
-                res.redirect("/");
             }
         }
+);
 
-    );
+}
 
-       }
-    else {
+app.post("/registerAluno/:matricula?", function(req, res) {
+    if (!req.params.matricula) {
+        cadastraNovoAluno(req, res);
+    } else {
         var nome = req.body.nome.trim();
         var matricula = req.params.matricula;
         if (!nome) {
