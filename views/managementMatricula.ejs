@@ -1,0 +1,22 @@
+<%- contentFor('body') %>
+<h1 class="text-center">Gerenciamento De Matriculas</h1>
+<div class="container">
+    </br>
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                    <h3>Alunos Matriculados</h3>
+            </div>
+            <div class="panel-body">
+                <div>
+                    <% listaAlunos.forEach(function(aluno) { %>
+                        <a href="/matriculaAluno/<%=aluno.matriculaAluno%>" class="list-group-item">
+                            <%= aluno.nome %> (<%= aluno.matriculaAluno %>)
+                        </a>
+                    <% }); %>
+                </div>
+        </div>
+    </div>
+    <div class="col-md-3"></div>
+</div>
