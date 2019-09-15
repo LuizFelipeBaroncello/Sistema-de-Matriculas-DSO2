@@ -343,7 +343,11 @@ app.post("/registerDisciplina/:codigoDisciplina?", function(req, res) {
     }
 });
 
+//
+
 app.get("/matriculaAluno/:matriculaAluno", function(req, res) {
+    
+//Serviço para consultar as matriculas no banco, baseado em um aluno
     buscaAlunoPorMatricula(req.params.matriculaAluno)
         .then(function (aluno) {
             if (!aluno){
@@ -371,19 +375,46 @@ app.get("/matriculaAluno/:matriculaAluno", function(req, res) {
 
 //Renderizar matrizSelecionadas, mostrando horários  (Raphael)
 
-//serviço para adicionar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
+app.get("/matriculaAluno/removeNegada/:codigoDisciplina", function(req, res) {
+
+    //Serviço para tirar matéria negada (não salva no banco, mas renderiza matricula aluno novamente)  (Raphael)
+
+    //pegar o que tem no body ()
+    //tirar de negadas a disciplina do codigo que veio no param
+    //adicionar essa mesma disciplina no selecionadas
+    //renderizar a tela
+});
+
+///moises divide
+
+app.get("/matriculaAluno/removeNegada/:codigoDisciplina", function(req, res) {
+    //pegar o que tem no body ()
+    //tirar de negadas a disciplina do codigo que veio no param
+    //adicionar essa mesma disciplina no selecionadas
+    //renderizar a tela
+});
+
+app.get("/matriculaAluno/adicionaSelecionada/:codigoDisciplina", function(req, res) {
+ //serviço para adicionar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
     //Esse serviço deve retirar a matéria selecionada de materias disponíveis
     //Esse serviço pode negar uma matéria e colocar ela em matéria negada
         //Uma matéria pode virar negada se na relação ela tiver a flag matriculaValida false
+});
 
-//serviço para tirar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
+app.get("/matriculaAluno/removeSelecionada/:codigoDisciplina", function(req, res) {
+  //serviço para tirar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
     //quando uma eh tirada, verificar se alguma negada pode entrar (cuidado para não entrar com duas kkk)
-
-//Serviço para tirar matéria negada (não salva no banco, mas renderiza matricula aluno novamente)  (Raphael)
-
+});
+   
+app.post("/matriculaAluno/salvaMatricula/:matriculaAluno", function(req, res) {
+    
 //Serviço para salvar no banco que salva as matriculas (tanto negadas quando dadas)
+});
+     
 
-//Serviço para consultar as matriculas no banco, baseado em um aluno
+
+
+
 
 ///////////Futuramente
 //serviço para listar os alunos de uma disciplina
