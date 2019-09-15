@@ -112,10 +112,18 @@ function renderizaPaginaInicial(res) {
         .toArray(function (err, alunos) {
             buscaDisciplinas()
                 .toArray(function (err, disciplinas) {
-                    res.render("home", {title: "Inicio", listaAlunos: alunos, listaDisciplinas: disciplinas});
+                    res.render("home", {title: "Início", listaAlunos: alunos, listaDisciplinas: disciplinas});
                 });
         });
 }
+
+app.get("/managementMatricula", function(req, res){
+    buscaAlunos()
+        .toArray(function(err, alunos){
+            res.render("managementMatricula",{title: "Gerenciamento De Matriculas", listaAlunos: alunos})
+        })
+
+});
 
 app.get("/registerAluno", function(req, res) {
     res.render("registerAluno", {
