@@ -67,6 +67,26 @@ function insereDisciplinaNoBanco(nome, codigo, horariosDiciplinas) {
         .insertOne({nome: nome, codigoDisciplina: codigo, horarios: horariosDiciplinas});
 }
 
+function setDisciplinaNegadaParaMatriculas(codigo) {
+    client
+        .db(dbName)
+        .collection("matricula")
+        .updateMany(
+            {
+                codigoDisciplina: codigo
+            },
+            {
+                $set: {matriculaValida: false}
+            },
+            function (err, result) {
+                if (err) {
+                    console.log(err  + "errror banco");
+                    throw err;
+                }
+                return;
+            });
+}
+
 function insereMatriculaBanco(matricula) {
     client
         .db(dbName)
@@ -357,6 +377,8 @@ function atualizaDisciplina(req, res) {
 
     const isDisciplinaValida = validateDisciplina(nome, codigo, qtdHorariosSelecionados, res);
 
+    setDisciplinaNegadaParaMatriculas(codigo);
+
     if (!isDisciplinaValida) {
         renderizaTelaBadRequest(res)
     } else {
@@ -406,11 +428,13 @@ function handleMatrizDisciplinasSelecionadas() {
     let listaHorariosSelecionados = [];
 
     listaDisciplinasSelecionadas.forEach(function(disciplina) {
-        disciplina.horarios.forEach(function(horario) {
-            horario = {...horario, nome: disciplina.nome};
+        for (i = 0; i < disciplina.horarios.length; i++) {
+            disciplina.horarios[i] = {...disciplina.horarios[i], nome: disciplina.nome};
+        }
+
+        disciplina.horarios.forEach(function (horario) {
+            listaHorariosSelecionados.push(horario);
         })
-        _.concat(listaHorariosSelecionados, disciplina.horarios);
-        //listaHorariosSelecionados.addAll(disciplina.horarios)
     });
 
     matrizSelecionadas =  criaMatrizDisciplinasMatricula(listaHorariosSelecionados);
