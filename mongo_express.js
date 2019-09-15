@@ -394,8 +394,12 @@ app.get("/matriculaAluno/removeNegada/:codigoDisciplina", function(req, res) {
     //renderizar a tela
 });
 
-app.get("/matriculaAluno/adicionaSelecionada/:codigoDisciplina", function(req, res) {
- //serviço para adicionar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
+app.post("/matriculaAluno/adicionaSelecionada/:codigoDisciplina", function(req, res) {
+ 
+    let listaDisciplinasDisponiveis = req.body.listaDisciplinasDisponiveis;
+    console.log(listaDisciplinasDisponiveis);
+    console.log(req.body)
+    //serviço para adicionar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
     //Esse serviço deve retirar a matéria selecionada de materias disponíveis
     //Esse serviço pode negar uma matéria e colocar ela em matéria negada
         //Uma matéria pode virar negada se na relação ela tiver a flag matriculaValida false
