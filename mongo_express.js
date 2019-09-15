@@ -341,7 +341,45 @@ app.post("/registerDisciplina/:codigoDisciplina?", function(req, res) {
     } else {
         atualizaDisciplina(req, res);
     }
-}); 
+});
+
+app.get("/matriculaAluno/:matriculaAluno", function(req, res) {
+    buscaAlunoPorMatricula(req.params.matriculaAluno)
+        .then(function (aluno) {
+            if (!aluno){
+                renderizaTelaNotFound(res);
+            } else {
+                buscaDisciplinas()
+                    .toArray(function (err, disciplinas) {
+                        res.render("matriculaAluno", {
+                            title: "Matricula aluno", 
+                            aluno: aluno,
+                            listaDisciplinasDisponiveis: disciplinas,//subtrair as selecionadas e negadas
+                            listaDisciplinasSelecionadas: disciplinas,//pegar do banco as selecionadas
+                            listaDisciplinasNegadas: disciplinas,//pegar do banco as negadas
+                            matrizSelecionadas: {},
+                            disciplina: {} //tirar
+                        });
+                    });
+            }
+        });
+});
+
+//serviço para adicionar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
+    //Esse serviço deve retirar a matéria selecionada de materias disponíveis
+    //Esse serviço pode negar uma matéria e colocar ela em matéria negada
+        //Uma matéria pode virar negada se na relação ela tiver a flag matriculaValida false
+
+//serviço para tirar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
+    //quando uma eh tirada, verificar se alguma negada pode entrar (cuidado para não entrar com duas kkk)
+//Serviço para tirar matéria negada (não salva no banco, mas renderiza matricula aluno novamente)
+
+//Serviço para salvar no banco que salva as matriculas (tanto negadas quando dadas)
+
+//Serviço para consultar as matriculas no banco, baseado em um aluno
+
+///////////Futuramente
+//serviço para listar os alunos de uma disciplina
 
 client.connect(function(err, db) {
     app.listen(port, function () {

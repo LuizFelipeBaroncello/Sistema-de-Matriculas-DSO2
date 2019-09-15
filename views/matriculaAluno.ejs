@@ -1,0 +1,288 @@
+<%- contentFor('body') %>
+<h1 class="text-center"><%=aluno.nome%> (<%=aluno.matriculaAluno%>)</h1>
+
+<form method="post" action="/registerAluno/<%=(aluno.matriculaAluno ? aluno.matriculaAluno : '')%>">
+  <div class="form-group">
+   
+    <div class="container">
+        <div class="table-responsive text-center">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th class="text-center">Segunda</th>
+                            <th class="text-center">Terça</th>
+                            <th class="text-center">Quarta</th>
+                            <th class="text-center">Quinta</th>
+                            <th class="text-center">Sexta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th class="text-center">6:30</th>
+                            <td>
+                                <label class="container-matricula-diciplina">
+                                    <% if (matrizSelecionadas.horarios && matrizSelecionadas.horarios[0][0]) { %>
+                                        <span class="checkmark-materia-selecionada"><% matrizSelecionadas.horarios[0][0] %></span>    
+                                    <% } else { %>
+                                        <span class="checkmark"></span>    
+                                    <% } %>  
+                                </label>                                          
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[1][0]) { %>
+                                        <input type="checkbox" checked name="ter1">
+                                    <% } else { %>
+                                        <input type="checkbox" name="ter1"> 
+                                    <% } %>  
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[2][0]) { %>
+                                        <input type="checkbox" checked name="quat1">
+                                    <% } else { %>
+                                        <input type="checkbox" name="quat1">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[3][0]) { %>
+                                        <input type="checkbox" checked name="quint1">
+                                    <% } else { %>
+                                        <input type="checkbox" name="quint1">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                     
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[4][0]) { %>
+                                        <input type="checkbox" checked name="sex1">
+                                    <% } else { %>
+                                        <input type="checkbox" name="sex1">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                                                     
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-center">7:20</th>
+                            <td>
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[0][1]) { %>
+                                        <input type="checkbox" checked name="seg2">
+                                    <% } else { %>
+                                        <input type="checkbox" name="seg2">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                                          
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[1][1]) { %>
+                                        <input type="checkbox" checked name="ter2">
+                                    <% } else { %>
+                                        <input type="checkbox" name="ter2">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[2][1]) { %>
+                                        <input type="checkbox" checked name="quat2">
+                                    <% } else { %>
+                                        <input type="checkbox" name="quat2">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[3][1]) { %>
+                                        <input type="checkbox" checked name="quint2">
+                                    <% } else { %>
+                                        <input type="checkbox" name="quint2">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                     
+                            </td>
+                            <td>                                
+                            <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[4][1]) { %>
+                                        <input type="checkbox" checked name="sex2">
+                                    <% } else { %>
+                                        <input type="checkbox" name="sex2">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                                                     
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-center">8:20</th>
+                            <td>
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[0][2]) { %>
+                                        <input type="checkbox" checked name="seg3">
+                                    <% } else { %>
+                                        <input type="checkbox"  name="seg3">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                                          
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[1][2]) { %>
+                                        <input type="checkbox" checked name="ter3">
+                                    <% } else { %>
+                                        <input type="checkbox" name="ter3">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[2][2]) { %>
+                                        <input type="checkbox" checked name="quat3">
+                                    <% } else { %>
+                                        <input type="checkbox" name="quat3">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[3][2]) { %>
+                                        <input type="checkbox" checked name="quint3">
+                                    <% } else { %>
+                                        <input type="checkbox" name="quint3">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                     
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[4][2]) { %>
+                                        <input type="checkbox" checked name="sex3">
+                                    <% } else { %>
+                                        <input type="checkbox" name="sex3">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                                                     
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="text-center">9:10</th>
+                            <td>
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[0][3]) { %>
+                                        <input type="checkbox" checked name="seg4">
+                                    <% } else { %>
+                                        <input type="checkbox" name="seg4">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                                          
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[1][3]) { %>
+                                        <input type="checkbox" checked name="ter4">
+                                    <% } else { %>
+                                        <input type="checkbox" name="ter4">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[2][3]) { %>
+                                        <input type="checkbox" checked name="quat4">
+                                    <% } else { %>
+                                        <input type="checkbox" name="quat4">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                 
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[3][3]) { %>
+                                        <input type="checkbox" checked name="quint4">
+                                    <% } else { %>
+                                        <input type="checkbox" name="quint4">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                     
+                            </td>
+                            <td>                                
+                                <label class="container-check">
+                                    <% if (disciplina.horarios && disciplina.horarios[4][3]) { %>
+                                        <input type="checkbox" checked name="sex4">
+                                    <% } else { %>
+                                        <input type="checkbox" name="sex4">
+                                    <% } %>
+                                    <span class="checkmark"></span>
+                                </label>                                                     
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Disciplinas Disponíveis</div>
+                    <div class="panel-body">
+                        <ul class="list-group">
+                            <% listaDisciplinasDisponiveis.forEach(function(disciplina) { %>
+                                <a href="#" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
+                            <% }); %>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Disciplinas Selecionadas</div>
+                    <div class="panel-body">
+                        <% listaDisciplinasSelecionadas.forEach(function(disciplina) { %>
+                            <a href="#" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-heading">Disciplinas Negadas</div>
+                    <div class="panel-body">
+                        <% listaDisciplinasNegadas.forEach(function(disciplina) { %>
+                            <a href="#" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
+                        <% }); %>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <div class="col-md-1">
+      <a href="/">
+        <button type="button" class="btn btn-danger">
+          Cancelar   
+        </button>
+      </a>
+    </div>
+    <div class="col-md-10"></div>
+    <div class="col-md-1">
+      <button type="submit" class="btn btn-success">
+        Salvar   
+      </button>
+    </div>
+  </div>
+</form>
+
+
