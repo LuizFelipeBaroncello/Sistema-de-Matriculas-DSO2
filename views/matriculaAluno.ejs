@@ -239,7 +239,7 @@
                     <div class="panel-body">
                         <ul class="list-group">
                             <% listaDisciplinasDisponiveis.forEach(function(disciplina) { %>
-                                <a href="#" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
+                                <a href="/matriculaAluno/adicionaSelecionada/<%=disciplina.codigoDisciplina%>&<%=aluno.matriculaAluno%>" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
                             <% }); %>
                         </ul>
                     </div>
@@ -251,7 +251,9 @@
                     <div class="panel-heading">Disciplinas Selecionadas</div>
                     <div class="panel-body">
                         <% listaDisciplinasSelecionadas.forEach(function(disciplina) { %>
-                            <a href="#" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
+                            <% if (disciplina) {%>
+                                <a href="#" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
+                            <%}%>
                         <% }); %>
                     </div>
                 </div>
@@ -262,7 +264,9 @@
                     <div class="panel-heading">Disciplinas Negadas</div>
                     <div class="panel-body">
                         <% listaDisciplinasNegadas.forEach(function(disciplina) { %>
-                            <a href="#" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
+                            <% if (disciplina) {%>
+                                <a href="#" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
+                            <%}%>
                         <% }); %>
                     </div>
                 </div>

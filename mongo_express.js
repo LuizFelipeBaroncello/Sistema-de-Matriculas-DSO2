@@ -4,6 +4,8 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
 
+var _ = require('lodash');
+
 var app = express();
 app.set('view engine', 'ejs');
 app.use(expressLayouts);
@@ -11,6 +13,11 @@ app.use(express.urlencoded());
 
 const port = 80;
 const dbName = "matriculas";
+
+let listaDisciplinasDisponiveis = [];
+let listaDisciplinasSelecionadas = [];
+let listaDisciplinasNegadas = [];
+let alunoSendoMatriculado;
 
 app.use(express.static(__dirname + '/public'));
 
@@ -355,12 +362,19 @@ app.get("/matriculaAluno/:matriculaAluno", function(req, res) {
             } else {
                 buscaDisciplinas()
                     .toArray(function (err, disciplinas) {
+                        
+                        listaDisciplinasDisponiveis = disciplinas;
+                        listaDisciplinasSelecionadas = [];
+                        listaDisciplinasNegadas = [];
+                        
+                        alunoSendoMatriculado = aluno;
+
                         res.render("matriculaAluno", {
                             title: "Matricula aluno", 
-                            aluno: aluno,
-                            listaDisciplinasDisponiveis: disciplinas,//subtrair as selecionadas e negadas
-                            listaDisciplinasSelecionadas: disciplinas,//pegar do banco as selecionadas
-                            listaDisciplinasNegadas: disciplinas,//pegar do banco as negadas
+                            aluno: alunoSendoMatriculado,
+                            listaDisciplinasDisponiveis: listaDisciplinasDisponiveis,
+                            listaDisciplinasSelecionadas: listaDisciplinasSelecionadas,
+                            listaDisciplinasNegadas: listaDisciplinasNegadas,
                             matrizSelecionadas: {},
                             disciplina: {} //tirar
                         });
@@ -387,18 +401,69 @@ app.get("/matriculaAluno/removeNegada/:codigoDisciplina", function(req, res) {
 
 ///moises divide
 
-app.get("/matriculaAluno/removeNegada/:codigoDisciplina", function(req, res) {
-    //pegar o que tem no body ()
-    //tirar de negadas a disciplina do codigo que veio no param
-    //adicionar essa mesma disciplina no selecionadas
-    //renderizar a tela
-});
+function getDisciplinaSelecionadaPeloUsuario(codigoDisciplina) {
+    const indexDisciplinaSelecionada = _.findIndex(listaDisciplinasDisponiveis, function(disciplina){
+        return disciplina.codigoDisciplina == codigoDisciplina;
+    })
+    
+    return listaDisciplinasDisponiveis[indexDisciplinaSelecionada];
+}
 
-app.post("/matriculaAluno/adicionaSelecionada/:codigoDisciplina", function(req, res) {
+function isNovaDisciplinaConflitante(disciplinaSelecionada) {
+    let isConflitante = false;
+
+    listaDisciplinasSelecionadas.forEach(function(disciplina) {
+        disciplina.horarios.forEach(function(horario) {
+            disciplinaSelecionada.horarios.forEach(function(horarioNova) {
+                if (horario.diaSemana == horarioNova.diaSemana && horario.horario == horarioNova.horario) {
+                    isConflitante = true;
+                }
+            });
+        })
+    });
+
+    return isConflitante;
+}
+
+app.get("/matriculaAluno/adicionaSelecionada/:codigoDisciplinaEMatriculaAluno", function(req, res) {
  
-    let listaDisciplinasDisponiveis = req.body.listaDisciplinasDisponiveis;
-    console.log(listaDisciplinasDisponiveis);
-    console.log(req.body)
+    console.log("Chamado");
+
+    let [codigoDisciplina, matriculaAluno] = req.params.codigoDisciplinaEMatriculaAluno.split("&");
+
+    const disciplinaSelecionada = getDisciplinaSelecionadaPeloUsuario(codigoDisciplina);
+    
+    let isConflitante = isNovaDisciplinaConflitante(disciplinaSelecionada);
+
+    if (!isConflitante) {
+        listaDisciplinasSelecionadas.push(disciplinaSelecionada);
+    } else {
+        listaDisciplinasNegadas.push(disciplinaSelecionada);
+    }
+
+    _.remove(listaDisciplinasDisponiveis, function(disciplina) {
+        return disciplina.codigoDisciplina == codigoDisciplina; 
+    })
+ 
+
+    res.render("matriculaAluno", {
+        title: "Matricula aluno", 
+        aluno: alunoSendoMatriculado,
+        listaDisciplinasDisponiveis: listaDisciplinasDisponiveis,
+        listaDisciplinasSelecionadas: listaDisciplinasSelecionadas,
+        listaDisciplinasNegadas: listaDisciplinasNegadas,
+        matrizSelecionadas: {},
+        disciplina: {} //tirar
+    });
+
+    //client
+    ///.db(dbName)
+    //.collection("aluno")
+    //.insertOne({nome: nome, matriculaAluno: matricula});
+
+ 
+
+ 
     //serviço para adicionar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
     //Esse serviço deve retirar a matéria selecionada de materias disponíveis
     //Esse serviço pode negar uma matéria e colocar ela em matéria negada
