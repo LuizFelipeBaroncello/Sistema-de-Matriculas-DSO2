@@ -251,8 +251,8 @@
                     <div class="panel-heading">Disciplinas Selecionadas</div>
                     <div class="panel-body">
                         <% listaDisciplinasSelecionadas.forEach(function(disciplina) { %>
-                            <% if (disciplina) {%>
-                                <a href="#" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
+                            <% if (disciplina) {%> 
+                                <a href="/matriculaAluno/removeSelecionada/<%=disciplina.codigoDisciplina%>" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
                             <%}%>
                         <% }); %>
                     </div>
@@ -265,7 +265,7 @@
                     <div class="panel-body">
                         <% listaDisciplinasNegadas.forEach(function(disciplina) { %>
                             <% if (disciplina) {%>
-                                <a href="#" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
+                                <a href="/matriculaAluno/removeNegada/<%=disciplina.codigoDisciplina%>" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
                             <%}%>
                         <% }); %>
                     </div>

@@ -59,6 +59,13 @@ function insereDisciplinaNoBanco(nome, codigo, horariosDiciplinas) {
         .insertOne({nome: nome, codigoDisciplina: codigo, horarios: horariosDiciplinas});
 }
 
+function insereMatriculaBanco(matricula) {
+    client
+        .db(dbName)
+        .collection("matricula")
+        .insertOne(matricula);
+}
+
 function atualizaAlunoNoBanco(nome, matricula) {
     client
     .db(dbName)
@@ -366,47 +373,36 @@ app.get("/matriculaAluno/:matriculaAluno", function(req, res) {
                         listaDisciplinasDisponiveis = disciplinas;
                         listaDisciplinasSelecionadas = [];
                         listaDisciplinasNegadas = [];
-                        
+ 
+                        //Uma matéria pode virar negada se na relação ela tiver a flag matriculaValida false
+
                         alunoSendoMatriculado = aluno;
 
-                        res.render("matriculaAluno", {
-                            title: "Matricula aluno", 
-                            aluno: alunoSendoMatriculado,
-                            listaDisciplinasDisponiveis: listaDisciplinasDisponiveis,
-                            listaDisciplinasSelecionadas: listaDisciplinasSelecionadas,
-                            listaDisciplinasNegadas: listaDisciplinasNegadas,
-                            matrizSelecionadas: {},
-                            disciplina: {} //tirar
-                        });
+                        renderizaTelaMatricula();
                     });
             }
         });
 });
 
-//Chamar serviço da lista de selecionadas (Raphael)
-//Chamar serviço da lista de disponiveis  (Raphael)
-//Chamar serviço da lista de negadas  (Raphael)
-
 //Renderizar matrizSelecionadas, mostrando horários  (Raphael)
+function renderizaTelaMatricula() {
+    res.render("matriculaAluno", {
+        title: "Matricula aluno", 
+        aluno: alunoSendoMatriculado,
+        listaDisciplinasDisponiveis: listaDisciplinasDisponiveis,
+        listaDisciplinasSelecionadas: listaDisciplinasSelecionadas,
+        listaDisciplinasNegadas: listaDisciplinasNegadas,
+        matrizSelecionadas: {},
+        disciplina: {} //tirar
+    });
+}
 
-app.get("/matriculaAluno/removeNegada/:codigoDisciplina", function(req, res) {
-
-    //Serviço para tirar matéria negada (não salva no banco, mas renderiza matricula aluno novamente)  (Raphael)
-
-    //pegar o que tem no body ()
-    //tirar de negadas a disciplina do codigo que veio no param
-    //adicionar essa mesma disciplina no selecionadas
-    //renderizar a tela
-});
-
-///moises divide
-
-function getDisciplinaSelecionadaPeloUsuario(codigoDisciplina) {
-    const indexDisciplinaSelecionada = _.findIndex(listaDisciplinasDisponiveis, function(disciplina){
+function getDisciplinaSelecionadaPeloUsuario(codigoDisciplina, listaParaAchar) {
+    const indexDisciplinaSelecionada = _.findIndex(listaParaAchar, function(disciplina){
         return disciplina.codigoDisciplina == codigoDisciplina;
     })
     
-    return listaDisciplinasDisponiveis[indexDisciplinaSelecionada];
+    return listaParaAchar[indexDisciplinaSelecionada];
 }
 
 function isNovaDisciplinaConflitante(disciplinaSelecionada) {
@@ -425,13 +421,11 @@ function isNovaDisciplinaConflitante(disciplinaSelecionada) {
     return isConflitante;
 }
 
-app.get("/matriculaAluno/adicionaSelecionada/:codigoDisciplinaEMatriculaAluno", function(req, res) {
- 
-    console.log("Chamado");
+app.get("/matriculaAluno/adicionaSelecionada/:codigoDisciplina", function(req, res) {
 
-    let [codigoDisciplina, matriculaAluno] = req.params.codigoDisciplinaEMatriculaAluno.split("&");
+    let codigoDisciplina = req.params.codigoDisciplina;
 
-    const disciplinaSelecionada = getDisciplinaSelecionadaPeloUsuario(codigoDisciplina);
+    const disciplinaSelecionada = getDisciplinaSelecionadaPeloUsuario(codigoDisciplina, listaDisciplinasDisponiveis);
     
     let isConflitante = isNovaDisciplinaConflitante(disciplinaSelecionada);
 
@@ -445,49 +439,50 @@ app.get("/matriculaAluno/adicionaSelecionada/:codigoDisciplinaEMatriculaAluno", 
         return disciplina.codigoDisciplina == codigoDisciplina; 
     })
  
-
-    res.render("matriculaAluno", {
-        title: "Matricula aluno", 
-        aluno: alunoSendoMatriculado,
-        listaDisciplinasDisponiveis: listaDisciplinasDisponiveis,
-        listaDisciplinasSelecionadas: listaDisciplinasSelecionadas,
-        listaDisciplinasNegadas: listaDisciplinasNegadas,
-        matrizSelecionadas: {},
-        disciplina: {} //tirar
-    });
-
-    //client
-    ///.db(dbName)
-    //.collection("aluno")
-    //.insertOne({nome: nome, matriculaAluno: matricula});
-
- 
-
- 
-    //serviço para adicionar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
-    //Esse serviço deve retirar a matéria selecionada de materias disponíveis
-    //Esse serviço pode negar uma matéria e colocar ela em matéria negada
-        //Uma matéria pode virar negada se na relação ela tiver a flag matriculaValida false
+    renderizaTelaMatricula()
 });
 
 app.get("/matriculaAluno/removeSelecionada/:codigoDisciplina", function(req, res) {
-  //serviço para tirar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
-    //quando uma eh tirada, verificar se alguma negada pode entrar (cuidado para não entrar com duas kkk)
+
+    let codigoDisciplina = req.params.codigoDisciplina;
+    const disciplinaSelecionada = getDisciplinaSelecionadaPeloUsuario(codigoDisciplina, listaDisciplinasSelecionadas);
+
+    if(disciplinaSelecionada) {
+         listaDisciplinasDisponiveis.push(disciplinaSelecionada)
+        _.remove(listaDisciplinasSelecionadas, function(disciplina) {
+            return disciplina.codigoDisciplina == codigoDisciplina; 
+         })
+    }
+
+    renderizaTelaMatricula()
 });
-   
+
+app.get("/matriculaAluno/removeNegada/:codigoDisciplina", function(req, res) {
+
+    let codigoDisciplina = req.params.codigoDisciplina;
+    const disciplinaNegada = getDisciplinaSelecionadaPeloUsuario(codigoDisciplina, listaDisciplinasNegadas); 
+        
+    if (disciplinaNegada) {
+        listaDisciplinasDisponiveis.push(disciplinaNegada);
+        _.remove(listaDisciplinasNegadas, function(disciplina) {
+            return disciplina.codigoDisciplina == codigoDisciplina; 
+        })
+    } 
+
+    renderizaTelaMatricula()
+});
+
 app.post("/matriculaAluno/salvaMatricula/:matriculaAluno", function(req, res) {
-    
-//Serviço para salvar no banco que salva as matriculas (tanto negadas quando dadas)
+    let matriculaAluno = req.params.matriculaAluno;
+
+    listaDisciplinasSelecionadas.forEach(function(disciplina) {
+        insereMatriculaBanco({codigoDisciplina: disciplina.codigoDisciplina, matriculaAluno: matriculaAluno, matriculaValida: true});
+    })
+    listaDisciplinasNegadas.forEach(function(disciplina) {
+        insereMatriculaBanco({codigoDisciplina: disciplina.codigoDisciplina, matriculaAluno: matriculaAluno, matriculaValida: false})
+    })
 });
      
-
-
-
-
-
-///////////Futuramente
-//serviço para listar os alunos de uma disciplina
-
 client.connect(function(err, db) {
     app.listen(port, function () {
         console.log("Server running! Press CTRL+C to close");
