@@ -365,6 +365,12 @@ app.get("/matriculaAluno/:matriculaAluno", function(req, res) {
         });
 });
 
+//Chamar serviço da lista de selecionadas (Raphael)
+//Chamar serviço da lista de disponiveis  (Raphael)
+//Chamar serviço da lista de negadas  (Raphael)
+
+//Renderizar matrizSelecionadas, mostrando horários  (Raphael)
+
 //serviço para adicionar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
     //Esse serviço deve retirar a matéria selecionada de materias disponíveis
     //Esse serviço pode negar uma matéria e colocar ela em matéria negada
@@ -372,7 +378,8 @@ app.get("/matriculaAluno/:matriculaAluno", function(req, res) {
 
 //serviço para tirar matéria selecionada (não salva no banco, mas renderiza matricula aluno novamente)
     //quando uma eh tirada, verificar se alguma negada pode entrar (cuidado para não entrar com duas kkk)
-//Serviço para tirar matéria negada (não salva no banco, mas renderiza matricula aluno novamente)
+
+//Serviço para tirar matéria negada (não salva no banco, mas renderiza matricula aluno novamente)  (Raphael)
 
 //Serviço para salvar no banco que salva as matriculas (tanto negadas quando dadas)
 
