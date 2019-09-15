@@ -18,6 +18,7 @@ let listaDisciplinasDisponiveis = [];
 let listaDisciplinasSelecionadas = [];
 let listaDisciplinasNegadas = [];
 let alunoSendoMatriculado;
+let matrizSelecionadas;
 
 app.use(express.static(__dirname + '/public'));
 
@@ -36,6 +37,13 @@ function buscaAlunoPorMatricula(matricula){
                 .db(dbName)
                 .collection("aluno")
                 .findOne({matriculaAluno: matricula})                    
+}
+
+function buscaMatriculasPorMatriculaAluno(matriculaAluno){
+    return client
+            .db(dbName)
+            .collection("matricula")
+            .find({matriculaAluno: matriculaAluno})   
 }
 
 function buscaDisciplinas() {
@@ -64,6 +72,13 @@ function insereMatriculaBanco(matricula) {
         .db(dbName)
         .collection("matricula")
         .insertOne(matricula);
+}
+
+function removeAllMatriculasAluno(matriculaAluno) {
+    client
+        .db(dbName)
+        .collection("matricula")
+        .remove({matriculaAluno: matriculaAluno});
 }
 
 function atualizaAlunoNoBanco(nome, matricula) {
@@ -357,11 +372,69 @@ app.post("/registerDisciplina/:codigoDisciplina?", function(req, res) {
     }
 });
 
-//
+function filterDisciplinasDisponiveis(disciplinas, matriculas) {
+    return _.filter(disciplinas, function (disciplina){
+        return -1 == _.findIndex(matriculas, function(matricula) {
+                            return matricula.codigoDisciplina == disciplina.codigoDisciplina;
+                        })
+    });
+}
+
+function criaMatrizDisciplinasMatricula(horarios) {
+    let matrizCriada = [];
+    
+    for (diaSemana = 0; diaSemana < 5; diaSemana++) {
+        matrizCriada.push([]);
+        for (horarioAula = 0; horarioAula < 4; horarioAula++) {
+            let horarioSetado = false;
+            horarios.forEach(horario => {
+                if (horario.diaSemana == diaSemana && horario.horario == horarioAula) {
+                    matrizCriada[diaSemana].push(horario.nome);
+                    horarioSetado = true;
+                }
+            });
+            if(!horarioSetado) {
+                matrizCriada[diaSemana].push(null);
+            }
+        }
+    }
+
+    return matrizCriada;
+}
+
+function handleMatrizDisciplinasSelecionadas() {
+    let listaHorariosSelecionados = [];
+
+    listaDisciplinasSelecionadas.forEach(function(disciplina) {
+        disciplina.horarios.forEach(function(horario) {
+            horario = {...horario, nome: disciplina.nome};
+        })
+        _.concat(listaHorariosSelecionados, disciplina.horarios);
+        //listaHorariosSelecionados.addAll(disciplina.horarios)
+    });
+
+    matrizSelecionadas =  criaMatrizDisciplinasMatricula(listaHorariosSelecionados);
+}
+
+function filterDisciplinasSelecionadas(disciplinas, matriculas) {
+    return _.filter(disciplinas, function(disciplina) {
+        return _.some(matriculas, function(matricula) {
+            return matricula.codigoDisciplina ==  disciplina.codigoDisciplina && matricula.matriculaValida;
+        })
+    })
+}
+
+
+function filterDisciplinasNegadas(disciplinas, matriculas) {
+    return _.filter(disciplinas, function(disciplina) {
+        return _.some(matriculas, function(matricula) {
+            return matricula.codigoDisciplina ==  disciplina.codigoDisciplina && !matricula.matriculaValida;
+        })
+    })
+}
 
 app.get("/matriculaAluno/:matriculaAluno", function(req, res) {
     
-//Serviço para consultar as matriculas no banco, baseado em um aluno
     buscaAlunoPorMatricula(req.params.matriculaAluno)
         .then(function (aluno) {
             if (!aluno){
@@ -369,30 +442,33 @@ app.get("/matriculaAluno/:matriculaAluno", function(req, res) {
             } else {
                 buscaDisciplinas()
                     .toArray(function (err, disciplinas) {
-                        
-                        listaDisciplinasDisponiveis = disciplinas;
-                        listaDisciplinasSelecionadas = [];
-                        listaDisciplinasNegadas = [];
- 
-                        //Uma matéria pode virar negada se na relação ela tiver a flag matriculaValida false
+                        buscaMatriculasPorMatriculaAluno(req.params.matriculaAluno)
+                            .toArray(function (err, matriculas) {
+                                alunoSendoMatriculado = aluno;
 
-                        alunoSendoMatriculado = aluno;
+                                listaDisciplinasSelecionadas = filterDisciplinasSelecionadas(disciplinas, matriculas); 
+                                listaDisciplinasNegadas = filterDisciplinasNegadas(disciplinas, matriculas);
 
-                        renderizaTelaMatricula();
+
+                                listaDisciplinasDisponiveis = filterDisciplinasDisponiveis(disciplinas, matriculas);
+                                
+                                handleMatrizDisciplinasSelecionadas();
+    
+                                renderizaTelaMatricula(res);
+                            })
                     });
             }
         });
 });
 
-//Renderizar matrizSelecionadas, mostrando horários  (Raphael)
-function renderizaTelaMatricula() {
+function renderizaTelaMatricula(res) {
     res.render("matriculaAluno", {
         title: "Matricula aluno", 
         aluno: alunoSendoMatriculado,
         listaDisciplinasDisponiveis: listaDisciplinasDisponiveis,
         listaDisciplinasSelecionadas: listaDisciplinasSelecionadas,
         listaDisciplinasNegadas: listaDisciplinasNegadas,
-        matrizSelecionadas: {},
+        matrizSelecionadas: matrizSelecionadas,
         disciplina: {} //tirar
     });
 }
@@ -431,6 +507,7 @@ app.get("/matriculaAluno/adicionaSelecionada/:codigoDisciplina", function(req, r
 
     if (!isConflitante) {
         listaDisciplinasSelecionadas.push(disciplinaSelecionada);
+        handleMatrizDisciplinasSelecionadas();
     } else {
         listaDisciplinasNegadas.push(disciplinaSelecionada);
     }
@@ -439,7 +516,7 @@ app.get("/matriculaAluno/adicionaSelecionada/:codigoDisciplina", function(req, r
         return disciplina.codigoDisciplina == codigoDisciplina; 
     })
  
-    renderizaTelaMatricula()
+    renderizaTelaMatricula(res)
 });
 
 app.get("/matriculaAluno/removeSelecionada/:codigoDisciplina", function(req, res) {
@@ -452,9 +529,10 @@ app.get("/matriculaAluno/removeSelecionada/:codigoDisciplina", function(req, res
         _.remove(listaDisciplinasSelecionadas, function(disciplina) {
             return disciplina.codigoDisciplina == codigoDisciplina; 
          })
+         handleMatrizDisciplinasSelecionadas();
     }
 
-    renderizaTelaMatricula()
+    renderizaTelaMatricula(res)
 });
 
 app.get("/matriculaAluno/removeNegada/:codigoDisciplina", function(req, res) {
@@ -469,18 +547,21 @@ app.get("/matriculaAluno/removeNegada/:codigoDisciplina", function(req, res) {
         })
     } 
 
-    renderizaTelaMatricula()
+    renderizaTelaMatricula(res)
 });
 
 app.post("/matriculaAluno/salvaMatricula/:matriculaAluno", function(req, res) {
-    let matriculaAluno = req.params.matriculaAluno;
+    let matriculaAluno = req.params.matriculaAluno.trim();
+
+    removeAllMatriculasAluno(matriculaAluno);
 
     listaDisciplinasSelecionadas.forEach(function(disciplina) {
-        insereMatriculaBanco({codigoDisciplina: disciplina.codigoDisciplina, matriculaAluno: matriculaAluno, matriculaValida: true});
+        insereMatriculaBanco({codigoDisciplina: disciplina.codigoDisciplina.trim(), matriculaAluno: matriculaAluno, matriculaValida: true});
     })
     listaDisciplinasNegadas.forEach(function(disciplina) {
-        insereMatriculaBanco({codigoDisciplina: disciplina.codigoDisciplina, matriculaAluno: matriculaAluno, matriculaValida: false})
+        insereMatriculaBanco({codigoDisciplina: disciplina.codigoDisciplina.trim(), matriculaAluno: matriculaAluno, matriculaValida: false})
     })
+    res.redirect("/managementMatricula");
 });
      
 client.connect(function(err, db) {

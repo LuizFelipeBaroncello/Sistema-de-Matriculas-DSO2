@@ -1,7 +1,7 @@
 <%- contentFor('body') %>
 <h1 class="text-center"><%=aluno.nome%> (<%=aluno.matriculaAluno%>)</h1>
 
-<form method="post" action="/registerAluno/<%=(aluno.matriculaAluno ? aluno.matriculaAluno : '')%>">
+<form method="post" action="/matriculaAluno/salvaMatricula/<%=(aluno.matriculaAluno ? aluno.matriculaAluno : '')%>">
   <div class="form-group">
    
     <div class="container">
@@ -239,7 +239,7 @@
                     <div class="panel-body">
                         <ul class="list-group">
                             <% listaDisciplinasDisponiveis.forEach(function(disciplina) { %>
-                                <a href="/matriculaAluno/adicionaSelecionada/<%=disciplina.codigoDisciplina%>&<%=aluno.matriculaAluno%>" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
+                                <a href="/matriculaAluno/adicionaSelecionada/<%=disciplina.codigoDisciplina%>" class="list-group-item"><%= disciplina.nome %> (<%= disciplina.codigoDisciplina %>)</a>
                             <% }); %>
                         </ul>
                     </div>
