@@ -87,18 +87,18 @@ function setDisciplinaNegadaParaMatriculas(codigo) {
             });
 }
 
-function insereMatriculaBanco(matricula) {
-    client
-        .db(dbName)
-        .collection("matricula")
-        .insertOne(matricula);
+function insereMatriculasBanco(matriculas) {
+    return client
+            .db(dbName)
+            .collection("matricula")
+            .insertMany(matriculas);
 }
 
 function removeAllMatriculasAluno(matriculaAluno) {
-    client
-        .db(dbName)
-        .collection("matricula")
-        .remove({matriculaAluno: matriculaAluno});
+    return client
+            .db(dbName)
+            .collection("matricula")
+            .deleteMany({matriculaAluno: matriculaAluno});
 }
 
 function atualizaAlunoNoBanco(nome, matricula) {
@@ -211,7 +211,7 @@ function validateDisciplina(nome, codigo, qtdHorariosSelecionados, res) {
     return true;
 }
 
-function renderizaTelaDadoJaCadastrado(res) {
+function renderizaTelaDadoJaCadastrado(res, codigo) {
     res.render("dadoJaCadastrado", {codigo: codigo, title: "Dado já cadastrado"});
 }
 
@@ -229,7 +229,7 @@ function cadastraNovoAluno(req, res) {
     buscaAlunoPorMatricula(matricula)
        .then(function(aluno) {
             if(aluno) {
-                renderizaTelaDadoJaCadastrado(res);
+                renderizaTelaDadoJaCadastrado(res, matricula);
             } else {
                 let nome = req.body.nome.trim();
                 let isAlunoValido = validateAluno(nome, matricula, res);
@@ -329,7 +329,7 @@ function cadastraNovaDisciplina(req, res) {
     buscaDisciplinaPorCodigo(codigo)
         .then(function(disciplina) {
             if(disciplina) {
-                renderizaTelaDadoJaCadastrado(res);
+                renderizaTelaDadoJaCadastrado(res, codigo);
             } else {
                 const nome = req.body.nome.trim();
                 const horarios = criaMatrizHorariosSelecionados(req);
@@ -577,15 +577,25 @@ app.get("/matriculaAluno/removeNegada/:codigoDisciplina", function(req, res) {
 app.post("/matriculaAluno/salvaMatricula/:matriculaAluno", function(req, res) {
     let matriculaAluno = req.params.matriculaAluno.trim();
 
-    removeAllMatriculasAluno(matriculaAluno);
+    removeAllMatriculasAluno(matriculaAluno).then(function() {
 
-    listaDisciplinasSelecionadas.forEach(function(disciplina) {
-        insereMatriculaBanco({codigoDisciplina: disciplina.codigoDisciplina.trim(), matriculaAluno: matriculaAluno, matriculaValida: true});
+        let matriculas = [];
+
+        listaDisciplinasSelecionadas.forEach(function(disciplina) {
+            matriculas.push({codigoDisciplina: disciplina.codigoDisciplina.trim(), matriculaAluno: matriculaAluno, matriculaValida: true});
+        })
+        listaDisciplinasNegadas.forEach(function(disciplina) {
+            matriculas.push({codigoDisciplina: disciplina.codigoDisciplina.trim(), matriculaAluno: matriculaAluno, matriculaValida: false});
+        })
+    
+        insereMatriculasBanco(matriculas)
+            .then(function() {
+                res.redirect("/managementMatricula");
+            }).catch(function (err) {
+                console.log(err);
+            })
     })
-    listaDisciplinasNegadas.forEach(function(disciplina) {
-        insereMatriculaBanco({codigoDisciplina: disciplina.codigoDisciplina.trim(), matriculaAluno: matriculaAluno, matriculaValida: false})
-    })
-    res.redirect("/managementMatricula");
+
 });
      
 client.connect(function(err, db) {
