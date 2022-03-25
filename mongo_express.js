@@ -1,5 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb+srv://admin:sadmin@cluster0-t6ug9.mongodb.net/test?retryWrites=true&w=majority";
+const uri = "mongodb+srv://admin2:admin2@cluster0.frbiw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 const express = require('express');
 const expressLayouts = require('express-ejs-layouts');
@@ -19,6 +19,28 @@ let listaDisciplinasSelecionadas = [];
 let listaDisciplinasNegadas = [];
 let alunoSendoMatriculado;
 let matrizSelecionadas;
+let textos = {};
+let textosPtBr = {
+    alunos: 'Alunos',
+    disciplinas: 'Disciplinas',
+    matriculas: 'Matrículas',
+    primeiraHora: new Date(2020, 1, 1, 8, 0, 0, 0).getHours().toLocaleString('pt-BR', {minimumIntegerDigits: 2}),
+    segundaHora: new Date(2020, 1, 1, 8, 0, 0, 0).getHours().toLocaleString('pt-BR', {minimumIntegerDigits: 2}),
+    terceiraHora: new Date(2020, 1, 1, 8, 0, 0, 0).getHours().toLocaleString('pt-BR', {minimumIntegerDigits: 2}),
+    quartaHora: new Date(2020, 1, 1, 8, 0, 0, 0).getHours().toLocaleString('pt-BR', {minimumIntegerDigits: 2}),
+    formatNumeros: () => formatNumeros(),
+}
+let textosEnUs = {
+    alunos: 'Students',
+    disciplinas: 'Lessons',
+    matriculas: 'enrol',
+    primeiraHora: new Date(2020, 1, 1, 8, 0, 0, 0).getHours().toLocaleString('en-US', {minimumIntegerDigits: 2}),
+    segundaHora: new Date(2020, 1, 1, 8, 0, 0, 0).getHours().toLocaleString('en-US', {minimumIntegerDigits: 2}),
+    terceiraHora: new Date(2020, 1, 1, 8, 0, 0, 0).getHours().toLocaleString('en-US', {minimumIntegerDigits: 2}),
+    quartaHora: new Date(2020, 1, 1, 8, 0, 0, 0).getHours().toLocaleString('en-US', {minimumIntegerDigits: 2}),
+    formatNumeros: () => formatNumeros(),
+}
+
 
 app.use(express.static(__dirname + '/public'));
 
@@ -153,6 +175,7 @@ function buscaDisciplinaPorCodigo(codigo) {
 //Lógica
 //////////////////////////////////////////////
 app.get("/", function(req, res) {
+    textos = textosPtBr;
     renderizaPaginaInicial(res);
 });
 
@@ -161,7 +184,7 @@ function renderizaPaginaInicial(res) {
         .toArray(function (err, alunos) {
             buscaDisciplinas()
                 .toArray(function (err, disciplinas) {
-                    res.render("home", {title: "Início", listaAlunos: alunos, listaDisciplinas: disciplinas});
+                    res.render("home", {title: "Início", listaAlunos: alunos, listaDisciplinas: disciplinas, textos: textos});
                 });
         });
 }
@@ -169,7 +192,7 @@ function renderizaPaginaInicial(res) {
 app.get("/managementMatricula", function(req, res){
     buscaAlunos()
         .toArray(function(err, alunos){
-            res.render("managementMatricula",{title: "Gerenciamento De Matriculas", listaAlunos: alunos})
+            res.render("managementMatricula",{title: "Gerenciamento De Matriculas", listaAlunos: alunos, textos: textos})
         })
 
 });
@@ -177,7 +200,8 @@ app.get("/managementMatricula", function(req, res){
 app.get("/registerAluno", function(req, res) {
     res.render("registerAluno", {
         title: "Novo aluno",
-        aluno: {}
+        aluno: {},
+        textos: textos
     });
 });
 
@@ -189,7 +213,8 @@ app.get("/registerAluno/:matriculaAluno", function(req, res) {
             } else {
                 res.render("registerAluno", {
                     title: "Alterar aluno", 
-                    aluno: aluno
+                    aluno: aluno,
+                    textos: textos
                 });
             }
         });
@@ -212,15 +237,15 @@ function validateDisciplina(nome, codigo, qtdHorariosSelecionados, res) {
 }
 
 function renderizaTelaDadoJaCadastrado(res, codigo) {
-    res.render("dadoJaCadastrado", {codigo: codigo, title: "Dado já cadastrado"});
+    res.render("dadoJaCadastrado", {codigo: codigo, title: "Dado já cadastrado", textos: textos});
 }
 
 function renderizaTelaBadRequest(res) {
-    res.render("badRequest", {title: "Requisição inválida"});
+    res.render("badRequest", {title: "Requisição inválida", textos: textos});
 }
 
 function renderizaTelaNotFound(res) {
-    res.render("naoEncontrado", {title: "Não Encontrado"});
+    res.render("naoEncontrado", {title: "Não Encontrado", textos: textos});
 }
 
 function cadastraNovoAluno(req, res) {
@@ -269,7 +294,7 @@ app.post("/registerAluno/:matricula?", function(req, res) {
 app.get("/registerDisciplina", function(req, res) {
     res.render("registerDisciplina", {
         title: "Nova disciplina",
-        disciplina: {}
+        disciplina: {}, textos: textos
     });
 });
 
@@ -283,7 +308,7 @@ app.get("/registerDisciplina/:codigoDisciplina", function(req, res) {
 
                 res.render("registerDisciplina", {
                     title: "Alterar disciplina", 
-                    disciplina: disciplinaTela
+                    disciplina: disciplinaTela, textos: textos
                 });
             }
         });
@@ -493,7 +518,7 @@ function renderizaTelaMatricula(res) {
         listaDisciplinasSelecionadas: listaDisciplinasSelecionadas,
         listaDisciplinasNegadas: listaDisciplinasNegadas,
         matrizSelecionadas: matrizSelecionadas,
-        disciplina: {} //tirar
+        disciplina: {}, textos: textos //tirar
     });
 }
 

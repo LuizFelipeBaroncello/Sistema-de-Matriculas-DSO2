@@ -18,9 +18,9 @@
 
             <!-- Cadastrar horários aqui -->
             <!-- FALTA SALVAR OS HORÁRIOS EM VARIÁVEIS E TRATAR NO SERVIÇO-->
-            <h2>Cadastrar horários Disciplina</h2>
+            <h2><%= textos.cadastrarHorarios%></h2>
             <div class="text-left">
-                OBS: Escolha no mínimo um horário, e no máximo 4.
+                <%= textos.avisoHorarios%>
             </div>
             <br>
             <div class="table-responsive text-center">
@@ -28,11 +28,11 @@
                     <thead>
                         <tr>
                             <th class="text-center">#</th>
-                            <th class="text-center">Segunda</th>
-                            <th class="text-center">Terça</th>
-                            <th class="text-center">Quarta</th>
-                            <th class="text-center">Quinta</th>
-                            <th class="text-center">Sexta</th>
+                            <th class="text-center"><%= textos.segunda%></th>
+                            <th class="text-center"><%= textos.terca%></th>
+                            <th class="text-center"><%= textos.quarta%></th>
+                            <th class="text-center"><%= textos.quinta%></th>
+                            <th class="text-center"><%= textos.sexta%></th>
                         </tr>
                     </thead>
                     <tbody>
